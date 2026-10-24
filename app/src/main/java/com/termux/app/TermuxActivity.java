@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.ContextMenu;
@@ -28,6 +29,7 @@ import android.widget.Toast;
 
 import com.termux.R;
 import com.termux.app.api.file.FileReceiverActivity;
+import com.termux.app.terminal.DrawerUtils;
 import com.termux.app.terminal.TermuxActivityRootView;
 import com.termux.app.terminal.TermuxTerminalSessionActivityClient;
 import com.termux.app.terminal.io.TermuxTerminalExtraKeys;
@@ -277,6 +279,8 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         // Send the {@link TermuxConstants#BROADCAST_TERMUX_OPENED} broadcast to notify apps that Termux
         // app has been opened.
         TermuxUtils.sendTermuxOpenedBroadcast(this);
+
+        DrawerUtils.setDrawerLeftEdgeSize(this, getDrawer(), 0.6f);
     }
 
     @Override
@@ -342,6 +346,12 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
 
         unregisterTermuxActivityBroadcastReceiver();
         getDrawer().closeDrawers();
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull android.content.res.Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        DrawerUtils.setDrawerLeftEdgeSize(this, getDrawer(), 0.6f);
     }
 
     @Override
@@ -921,7 +931,11 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         intentFilter.addAction(TERMUX_ACTIVITY.ACTION_RELOAD_STYLE);
         intentFilter.addAction(TERMUX_ACTIVITY.ACTION_REQUEST_PERMISSIONS);
 
-        registerReceiver(mTermuxActivityBroadcastReceiver, intentFilter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(mTermuxActivityBroadcastReceiver, intentFilter, Context.RECEIVER_EXPORTED);
+        } else {
+            registerReceiver(mTermuxActivityBroadcastReceiver, intentFilter);
+        }
     }
 
     private void unregisterTermuxActivityBroadcastReceiver() {

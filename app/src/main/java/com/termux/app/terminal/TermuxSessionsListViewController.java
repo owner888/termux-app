@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -59,11 +60,13 @@ public class TermuxSessionsListViewController extends ArrayAdapter<TermuxSession
 
         boolean shouldEnableDarkTheme = ThemeUtils.shouldEnableDarkTheme(mActivity, NightMode.getAppNightMode().getName());
 
-        if (shouldEnableDarkTheme) {
-            sessionTitleView.setBackground(
-                ContextCompat.getDrawable(mActivity, R.drawable.session_background_black_selected)
-            );
-        }
+        int bgResId = shouldEnableDarkTheme ? R.drawable.session_background_black_selected : R.drawable.session_background_selected;
+        sessionRowView.setBackground(ContextCompat.getDrawable(mActivity, bgResId));
+
+        boolean isCurrentSession = (sessionAtRow == mActivity.getCurrentSession());
+        sessionRowView.setActivated(isCurrentSession);
+
+        ImageView sessionIconView = sessionRowView.findViewById(R.id.session_icon);
 
         String name = sessionAtRow.mSessionName;
         String sessionTitle = sessionAtRow.getTitle();
@@ -89,6 +92,9 @@ public class TermuxSessionsListViewController extends ArrayAdapter<TermuxSession
         int defaultColor = shouldEnableDarkTheme ? Color.WHITE : Color.BLACK;
         int color = sessionRunning || sessionAtRow.getExitStatus() == 0 ? defaultColor : Color.RED;
         sessionTitleView.setTextColor(color);
+        if (sessionIconView != null) {
+            sessionIconView.setColorFilter(color);
+        }
         return sessionRowView;
     }
 
