@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.inputmethodservice.InputMethodService;
 import android.os.Build;
+import android.provider.Settings;
 import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowManager;
@@ -193,6 +194,31 @@ public class KeyboardUtils {
                 return false;
             }
         }
+    }
+
+    public static final String GBOARD_PACKAGE_PREFIX = "com.google.android.inputmethod.";
+    public static final String GBOARD_APPS_PACKAGE_PREFIX = "com.google.android.apps.inputmethod.";
+
+    /**
+     * Check if the default/current input method is Gboard.
+     *
+     * @param context The Context for operations.
+     * @return Returns {@code true} if default input method is Gboard, otherwise {@code false}.
+     */
+    public static boolean isDefaultInputMethodGboard(final Context context) {
+        if (context == null) return false;
+        try {
+            String defaultIme = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.DEFAULT_INPUT_METHOD);
+            if (defaultIme != null && (
+                defaultIme.startsWith(GBOARD_PACKAGE_PREFIX) ||
+                defaultIme.startsWith(GBOARD_APPS_PACKAGE_PREFIX)
+            )) {
+                return true;
+            }
+        } catch (Exception e) {
+            Logger.logError(LOG_TAG, "Failed to check default input method: " + e.getMessage());
+        }
+        return false;
     }
 
 }

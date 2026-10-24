@@ -190,7 +190,7 @@
 
                 <!-- IME Composing -->
                 <string name="termux_ime_composing_enabled_title">IME Composing Preview</string>
-                <string name="termux_ime_composing_enabled_off">Composing text is invisible until commit. (Default)</string>
+                <string name="termux_ime_composing_enabled_off">Composing text is invisible until commit. (Auto enabled for Gboard by default)</string>
                 <string name="termux_ime_composing_enabled_on">Show composing text as an inline preview at the cursor.</string>
 
         <!-- Terminal View Preferences -->

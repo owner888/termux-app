@@ -13,6 +13,7 @@ import com.termux.shared.termux.TermuxConstants;
 import com.termux.shared.logger.Logger;
 import com.termux.shared.data.DataUtils;
 import com.termux.shared.termux.TermuxUtils;
+import com.termux.shared.view.KeyboardUtils;
 import com.termux.shared.termux.settings.preferences.TermuxPreferenceConstants.TERMUX_APP;
 
 public class TermuxAppSharedPreferences extends AppSharedPreferences {
@@ -111,7 +112,10 @@ public class TermuxAppSharedPreferences extends AppSharedPreferences {
     }
 
     public boolean isImeComposingEnabled() {
-        return SharedPreferenceUtils.getBoolean(mSharedPreferences, TERMUX_APP.KEY_IME_COMPOSING_ENABLED, TERMUX_APP.DEFAULT_VALUE_KEY_IME_COMPOSING_ENABLED);
+        if (mSharedPreferences != null && mSharedPreferences.contains(TERMUX_APP.KEY_IME_COMPOSING_ENABLED)) {
+            return SharedPreferenceUtils.getBoolean(mSharedPreferences, TERMUX_APP.KEY_IME_COMPOSING_ENABLED, TERMUX_APP.DEFAULT_VALUE_KEY_IME_COMPOSING_ENABLED);
+        }
+        return KeyboardUtils.isDefaultInputMethodGboard(mContext);
     }
 
     public void setImeComposingEnabled(boolean value) {
