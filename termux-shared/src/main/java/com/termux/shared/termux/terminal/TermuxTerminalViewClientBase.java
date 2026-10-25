@@ -1,5 +1,6 @@
 package com.termux.shared.termux.terminal;
 
+import android.net.Uri;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
@@ -127,6 +128,11 @@ public class TermuxTerminalViewClientBase implements TerminalViewClient {
     @Override
     public void logStackTrace(String tag, Exception e) {
         Logger.logStackTrace(tag, e);
+    }
+
+    @Override
+    public boolean onCommitContent(Uri contentUri, String mimeType) {
+        return false;
     }
 
 }

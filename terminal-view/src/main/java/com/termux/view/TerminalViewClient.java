@@ -1,5 +1,6 @@
 package com.termux.view;
 
+import android.net.Uri;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -81,5 +82,9 @@ public interface TerminalViewClient {
     void logStackTraceWithMessage(String tag, String message, Exception e);
 
     void logStackTrace(String tag, Exception e);
+
+    default boolean onCommitContent(Uri contentUri, String mimeType) {
+        return false;
+    }
 
 }

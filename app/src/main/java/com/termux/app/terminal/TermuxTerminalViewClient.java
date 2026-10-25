@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.net.Uri;
 import android.media.AudioManager;
 import android.os.Environment;
 import android.text.TextUtils;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 import com.termux.R;
 import com.termux.app.TermuxActivity;
 import com.termux.shared.file.FileUtils;
+import com.termux.shared.termux.interact.ClipboardImageUtils;
 import com.termux.shared.interact.MessageDialogUtils;
 import com.termux.shared.interact.ShareUtils;
 import com.termux.shared.shell.ShellUtils;
@@ -799,9 +801,36 @@ public class TermuxTerminalViewClient extends TermuxTerminalViewClientBase {
         if (session == null) return;
         if (!session.isRunning()) return;
 
-        String text = ShareUtils.getTextStringFromClipboardIfSet(mActivity, true);
+        String text = ShareUtils.getTextStringFromClipboardIfSet(mActivity, false);
+        if (text != null && !text.isEmpty()) {
+            session.getEmulator().paste(text);
+            return;
+        }
+
+        String imagePath = ClipboardImageUtils.saveClipboardImageToFileIfSet(mActivity);
+        if (imagePath != null) {
+            session.getEmulator().paste(imagePath);
+            com.termux.shared.logger.Logger.showToast(mActivity, "Pasted image: " + imagePath, true);
+            return;
+        }
+
+        text = ShareUtils.getTextStringFromClipboardIfSet(mActivity, true);
         if (text != null)
             session.getEmulator().paste(text);
+    }
+
+    @Override
+    public boolean onCommitContent(Uri contentUri, String mimeType) {
+        String savedPath = ClipboardImageUtils.saveImageStreamToFile(mActivity, contentUri, mimeType);
+        if (savedPath != null) {
+            TerminalSession session = mActivity.getCurrentSession();
+            if (session != null && session.isRunning()) {
+                session.getEmulator().paste(savedPath);
+                com.termux.shared.logger.Logger.showToast(mActivity, "Pasted image: " + savedPath, false);
+                return true;
+            }
+        }
+        return false;
     }
 
 }

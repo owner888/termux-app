@@ -8,7 +8,9 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
@@ -33,6 +35,7 @@ import android.view.autofill.AutofillValue;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
+import android.view.inputmethod.InputContentInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Scroller;
 
@@ -367,6 +370,14 @@ public final class TerminalView extends View {
         // keyboard on Android TV (see https://github.com/termux/termux-app/issues/221).
         outAttrs.imeOptions = EditorInfo.IME_FLAG_NO_FULLSCREEN;
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            String[] mimeTypes = new String[]{"image/png", "image/jpeg", "image/gif", "image/webp"};
+            outAttrs.contentMimeTypes = mimeTypes;
+            if (outAttrs.extras == null) outAttrs.extras = new Bundle();
+            outAttrs.extras.putStringArray("androidx.core.view.inputmethod.EditorInfoCompat.CONTENT_MIME_TYPES", mimeTypes);
+            outAttrs.extras.putStringArray("android.support.v13.view.inputmethod.EditorInfoCompat.CONTENT_MIME_TYPES", mimeTypes);
+        }
+
         BaseInputConnection connection = new BaseInputConnection(this, true) {
 
             @Override
@@ -440,6 +451,36 @@ public final class TerminalView extends View {
                     finalizeComposingIfActive();
                 }
                 return result;
+            }
+
+            @Override
+            public boolean commitContent(InputContentInfo inputContentInfo, int flags, Bundle opts) {
+                if (TERMINAL_VIEW_KEY_LOGGING_ENABLED) {
+                    mClient.logInfo(LOG_TAG, "IME: commitContent()");
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1 && inputContentInfo != null) {
+                    boolean hasPermission = (flags & InputConnection.INPUT_CONTENT_GRANT_READ_URI_PERMISSION) != 0;
+                    if (hasPermission) {
+                        try {
+                            inputContentInfo.requestPermission();
+                        } catch (Exception e) {
+                            return false;
+                        }
+                    }
+                    try {
+                        Uri uri = inputContentInfo.getContentUri();
+                        String mimeType = inputContentInfo.getDescription() != null && inputContentInfo.getDescription().getMimeTypeCount() > 0
+                                ? inputContentInfo.getDescription().getMimeType(0) : "image/png";
+                        return mClient.onCommitContent(uri, mimeType);
+                    } finally {
+                        if (hasPermission) {
+                            try {
+                                inputContentInfo.releasePermission();
+                            } catch (Exception ignored) {}
+                        }
+                    }
+                }
+                return super.commitContent(inputContentInfo, flags, opts);
             }
 
             void sendTextToTerminal(CharSequence text) {

@@ -18,6 +18,7 @@ import androidx.annotation.Nullable;
 
 import com.termux.R;
 import com.termux.shared.interact.ShareUtils;
+import com.termux.shared.termux.interact.ClipboardImageUtils;
 import com.termux.shared.termux.shell.command.runner.terminal.TermuxSession;
 import com.termux.shared.termux.interact.TextInputDialogUtils;
 import com.termux.app.TermuxActivity;
@@ -191,7 +192,20 @@ public class TermuxTerminalSessionActivityClient extends TermuxTerminalSessionCl
     public void onPasteTextFromClipboard(@Nullable TerminalSession session) {
         if (!mActivity.isVisible()) return;
 
-        String text = ShareUtils.getTextStringFromClipboardIfSet(mActivity, true);
+        String text = ShareUtils.getTextStringFromClipboardIfSet(mActivity, false);
+        if (text != null && !text.isEmpty()) {
+            mActivity.getTerminalView().mEmulator.paste(text);
+            return;
+        }
+
+        String imagePath = ClipboardImageUtils.saveClipboardImageToFileIfSet(mActivity);
+        if (imagePath != null) {
+            mActivity.getTerminalView().mEmulator.paste(imagePath);
+            Logger.showToast(mActivity, "Pasted image: " + imagePath, true);
+            return;
+        }
+
+        text = ShareUtils.getTextStringFromClipboardIfSet(mActivity, true);
         if (text != null)
             mActivity.getTerminalView().mEmulator.paste(text);
     }
