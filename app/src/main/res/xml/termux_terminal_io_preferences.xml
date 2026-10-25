@@ -6,6 +6,7 @@
 
         <SwitchPreferenceCompat
             app:key="soft_keyboard_enabled"
+            app:icon="@drawable/ic_keyboard"
             app:summaryOff="@string/termux_soft_keyboard_enabled_off"
             app:summaryOn="@string/termux_soft_keyboard_enabled_on"
             app:title="@string/termux_soft_keyboard_enabled_title" />
@@ -18,6 +19,7 @@
 
         <SwitchPreferenceCompat
             app:key="ime_composing_enabled"
+            app:icon="@drawable/ic_translate"
             app:summaryOff="@string/termux_ime_composing_enabled_off"
             app:summaryOn="@string/termux_ime_composing_enabled_on"
             app:title="@string/termux_ime_composing_enabled_title" />

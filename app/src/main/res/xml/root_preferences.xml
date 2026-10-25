@@ -2,6 +2,7 @@
 
     <Preference
         app:key="termux"
+        app:icon="@drawable/ic_terminal"
         app:title="@string/termux_preferences_title"
         app:summary="@string/termux_preferences_summary"
         app:fragment="com.termux.app.fragments.settings.TermuxPreferencesFragment"/>
@@ -36,12 +37,14 @@
 
     <Preference
         app:key="about"
+        app:icon="@drawable/ic_info"
         app:title="@string/about_preference_title"
         app:persistent="false"/>
     <!-- app:layout="@layout/preference_markdown_text" -->
 
     <Preference
         app:key="donate"
+        app:icon="@drawable/ic_favorite"
         app:title="@string/donate_preference_title"
         app:persistent="false"
         app:isPreferenceVisible="false"/>

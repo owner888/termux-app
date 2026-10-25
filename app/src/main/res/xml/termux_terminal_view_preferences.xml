@@ -6,6 +6,7 @@
 
         <SwitchPreferenceCompat
             app:key="terminal_margin_adjustment"
+            app:icon="@drawable/ic_display"
             app:summaryOff="@string/termux_terminal_view_terminal_margin_adjustment_off"
             app:summaryOn="@string/termux_terminal_view_terminal_margin_adjustment_on"
             app:title="@string/termux_terminal_view_terminal_margin_adjustment_title" />
